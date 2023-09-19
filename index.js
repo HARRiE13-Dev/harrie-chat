@@ -1,20 +1,28 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const host = process.env.HOST || 'localhost';
+const app = require("express")();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 3000;
-const path = require('path')
+const path = require("path");
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+const mongoose = require("mongoose");
+const mongoDB =
+  "mongodb+srv://harrie:01T1OMpmMdPfOmHk@chats.ctqyzeq.mongodb.net/?retryWrites=true&w=majority";
+
+mongoose.connect(mongoDB).then(() => {
+  console.log("Connect success");
 });
 
-io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
-  });
-});
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
+// });
 
-http.listen(port, host, () => {
-  console.log(`Socket.IO server running at http://${host}:${port}/`);
-});
+// io.on("connection", (socket) => {
+//   socket.on("chat message", (msg) => {
+//     io.emit("chat message", msg);
+//   });
+// });
+
+// http.listen(port, host, () => {
+//   console.log(`Socket.IO server running at http://${host}:${port}/`);
+// });
