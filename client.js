@@ -1,4 +1,5 @@
-const socket = io('https://harrie-chat.vercel.app',{ transports : ['websocket'] });
+const socket = io('ws://harrie-chat.vercel.app',{ transports : ['websocket'] });
+
 const messages = document.getElementById('messages');
 const msgForm = document.getElementById('msgForm');
 
