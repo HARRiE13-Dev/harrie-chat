@@ -1,26 +1,27 @@
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://harrie:<password>@cluster0.yypgxh2.mongodb.net/?retryWrites=true&w=majority";
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+const mongoose = require("mongoose");
+const Msg = require("./models/messages");
+const io = require("socket.io")(3000);
+const mongoDB =
+  "mongodb+srv://harrie:01T1OMpmMdPfOmHk@chats.ctqyzeq.mongodb.net/?retryWrites=true&w=majority";
+mongoose
+  .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log("connected");
+  })
+  .catch((err) => console.log(err));
+io.on("connection", (socket) => {
+  Msg.find().then((result) => {
+    socket.emit("output-messages", result);
+  });
+  console.log("a user connected");
+  socket.emit("message", "Hello world");
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+  socket.on("chatmessage", (msg) => {
+    const message = new Msg({ msg });
+    message.save().then(() => {
+      io.emit("message", msg);
+    });
+  });
 });
-
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
